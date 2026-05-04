@@ -61,8 +61,7 @@ public class MenuPrincipal {
         panelContenido.add(crearPanelDemo("Gestión de Clientes", "Aquí irá el buscador de clientes"), "Clientes");
         panelContenido.add(crearPanelDemo("Gestión de Vehículos", "Aquí irá la tabla de vehículos"), "Vehiculos");
         panelContenido.add(crearPanelDemo("Órdenes de Trabajo", "Aquí gestionaremos los servicios"), "Ordenes");
-        panelContenido.add(crearPanelDemo("Módulo de Muelles", "Aquí irá el módulo principal que desarrollaremos"), "Muelles");
-
+        panelContenido.add(new PanelMuelles(), "Muelles");  
         // 5. AGREGAR ACCIONES A LOS BOTONES (La Magia)
         // Al hacer clic, le decimos al CardLayout que muestre la tarjeta con ese nombre exacto
         btnInicio.addActionListener(e -> cardLayout.show(panelContenido, "Inicio"));
