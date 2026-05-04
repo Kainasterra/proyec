@@ -61,8 +61,13 @@ public class MenuPrincipal {
         panelContenido.add(crearPanelDemo("Gestión de Clientes", "Aquí irá el buscador de clientes"), "Clientes");
         panelContenido.add(crearPanelDemo("Gestión de Vehículos", "Aquí irá la tabla de vehículos"), "Vehiculos");
         panelContenido.add(crearPanelDemo("Órdenes de Trabajo", "Aquí gestionaremos los servicios"), "Ordenes");
-        panelContenido.add(new PanelMuelles(), "Muelles");  
-        // 5. AGREGAR ACCIONES A LOS BOTONES (La Magia)
+// Instanciamos la Vista, el DAO y el Controlador
+        PanelMuelles panelMuelles = new PanelMuelles();
+        com.trebol.dao.ServicioMuelleDAO daoMuelles = new com.trebol.dao.ServicioMuelleDAO();
+        com.trebol.controller.ServicioMuelleController controllerMuelles = new com.trebol.controller.ServicioMuelleController(panelMuelles, daoMuelles);
+        
+        // Agregamos la vista al panel contenedor
+        panelContenido.add(panelMuelles, "Muelles");        // 5. AGREGAR ACCIONES A LOS BOTONES (La Magia)
         // Al hacer clic, le decimos al CardLayout que muestre la tarjeta con ese nombre exacto
         btnInicio.addActionListener(e -> cardLayout.show(panelContenido, "Inicio"));
         btnClientes.addActionListener(e -> cardLayout.show(panelContenido, "Clientes"));

@@ -94,4 +94,34 @@ public class PanelMuelles extends JPanel {
         // Finalmente, agregamos el contenedor central al panel principal
         add(panelCentro, BorderLayout.CENTER);
     }
+// --- GETTERS PARA EL CONTROLADOR ---
+    
+    public JTextField getTxtIdOrden() {
+        return txtIdOrden;
+    }
+
+    public JComboBox<String> getCbTipoReparacion() {
+        return cbTipoReparacion;
+    }
+
+    public JTextField getTxtDetalles() {
+        return txtDetalles;
+    }
+
+    public JTextField getTxtPiezas() {
+        return txtPiezas;
+    }
+
+    public JTextField getTxtTecnico() {
+        return txtTecnico;
+    }
+
+    public JButton getBtnGuardar() {
+        return btnGuardar;
+    }
+
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
+    }
+    
 }
