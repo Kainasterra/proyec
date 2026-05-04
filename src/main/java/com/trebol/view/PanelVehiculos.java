@@ -1,11 +1,14 @@
 package com.trebol.view;
 
+import com.trebol.utils.ComboItem;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class PanelVehiculos extends JPanel {
-    private JTextField txtIdCliente, txtPlacas, txtMarca, txtModelo, txtAnio;
+    private JComboBox<ComboItem> cbClientes; 
+    private JButton btnRefrescarCombo; // Nuevo botón
+    private JTextField txtPlacas, txtMarca, txtModelo, txtAnio;
     private JButton btnGuardar, btnActualizar, btnEliminar;
     private JTable tablaVehiculos;
     private DefaultTableModel modeloTabla;
@@ -26,14 +29,27 @@ public class PanelVehiculos extends JPanel {
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        txtIdCliente = new JTextField(10);
-        txtPlacas = new JTextField(10);
-        txtMarca = new JTextField(10);
-        txtModelo = new JTextField(10);
-        txtAnio = new JTextField(10);
+        // Inicializamos ComboBox y el botón de refrescar
+        cbClientes = new JComboBox<>();
+        btnRefrescarCombo = new JButton("🔄");
+        btnRefrescarCombo.setToolTipText("Actualizar lista de clientes");
 
-        colocarComponente(panelForm, new JLabel("ID Cliente:"), 0, 0, gbc);
-        colocarComponente(panelForm, txtIdCliente, 1, 0, gbc);
+        // Panel especial para juntar el combo y el botón en la misma celda
+        JPanel panelCombo = new JPanel(new BorderLayout(5, 0));
+        panelCombo.setBackground(Color.WHITE);
+        panelCombo.add(cbClientes, BorderLayout.CENTER);
+        panelCombo.add(btnRefrescarCombo, BorderLayout.EAST);
+
+        txtPlacas = new JTextField(15);
+        txtMarca = new JTextField(15);
+        txtModelo = new JTextField(15);
+        txtAnio = new JTextField(15);
+
+        // Fila 0: Cliente con su botón de refrescar
+        colocarComponente(panelForm, new JLabel("Cliente:"), 0, 0, gbc);
+        colocarComponente(panelForm, panelCombo, 1, 0, gbc);
+
+        // Fila 1 a 4: Resto de campos
         colocarComponente(panelForm, new JLabel("Placas:"), 0, 1, gbc);
         colocarComponente(panelForm, txtPlacas, 1, 1, gbc);
         colocarComponente(panelForm, new JLabel("Marca:"), 0, 2, gbc);
@@ -43,20 +59,20 @@ public class PanelVehiculos extends JPanel {
         colocarComponente(panelForm, new JLabel("Año:"), 0, 4, gbc);
         colocarComponente(panelForm, txtAnio, 1, 4, gbc);
 
-        // --- PANEL DE BOTONES ---
+        // --- PANEL DE BOTONES ACCIÓN ---
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         panelBotones.setBackground(Color.WHITE);
 
         btnGuardar = new JButton("Guardar");
-        btnGuardar.setBackground(new Color(46, 204, 113)); // Verde
+        btnGuardar.setBackground(new Color(46, 204, 113));
         btnGuardar.setForeground(Color.WHITE);
 
         btnActualizar = new JButton("Actualizar");
-        btnActualizar.setBackground(new Color(52, 152, 219)); // Azul
+        btnActualizar.setBackground(new Color(52, 152, 219));
         btnActualizar.setForeground(Color.WHITE);
 
         btnEliminar = new JButton("Eliminar");
-        btnEliminar.setBackground(new Color(231, 76, 60)); // Rojo
+        btnEliminar.setBackground(new Color(231, 76, 60));
         btnEliminar.setForeground(Color.WHITE);
 
         panelBotones.add(btnGuardar);
@@ -88,8 +104,9 @@ public class PanelVehiculos extends JPanel {
         p.add(c, gbc);
     }
 
-    // Getters para el controlador
-    public JTextField getTxtIdCliente() { return txtIdCliente; }
+    // Getters
+    public JComboBox<ComboItem> getCbClientes() { return cbClientes; }
+    public JButton getBtnRefrescarCombo() { return btnRefrescarCombo; }
     public JTextField getTxtPlacas() { return txtPlacas; }
     public JTextField getTxtMarca() { return txtMarca; }
     public JTextField getTxtModelo() { return txtModelo; }
@@ -100,3 +117,32 @@ public class PanelVehiculos extends JPanel {
     public JTable getTablaVehiculos() { return tablaVehiculos; }
     public DefaultTableModel getModeloTabla() { return modeloTabla; }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
