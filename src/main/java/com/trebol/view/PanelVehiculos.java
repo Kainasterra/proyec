@@ -5,16 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class PanelVehiculos extends JPanel {
-
-    // Componentes del formulario
-    private JTextField txtPlaca;
-    private JComboBox<String> cbMarca;   // Cambiado a ComboBox
-    private JComboBox<String> cbModelo;  // Cambiado a ComboBox
-    private JComboBox<String> cbAnio;    // Cambiado a ComboBox
-    private JTextField txtIdCliente;
-    private JButton btnGuardar;
-    
-    // Componentes de la tabla
+    private JTextField txtIdCliente, txtPlacas, txtMarca, txtModelo, txtAnio;
+    private JButton btnGuardar, btnActualizar, btnEliminar;
     private JTable tablaVehiculos;
     private DefaultTableModel modeloTabla;
 
@@ -25,75 +17,86 @@ public class PanelVehiculos extends JPanel {
     private void inicializarComponentes() {
         setLayout(new BorderLayout(20, 20));
         setBackground(new Color(245, 245, 245));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // 1. Encabezado
-        JLabel lblTitulo = new JLabel("Gestión de Vehículos");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        lblTitulo.setForeground(new Color(46, 64, 83));
-        add(lblTitulo, BorderLayout.NORTH);
+        // --- PANEL DE FORMULARIO ---
+        JPanel panelForm = new JPanel(new GridBagLayout());
+        panelForm.setBackground(Color.WHITE);
+        panelForm.setBorder(BorderFactory.createTitledBorder("Datos del Vehículo"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JPanel panelCentro = new JPanel(new BorderLayout(10, 20));
-        panelCentro.setBackground(new Color(245, 245, 245));
+        txtIdCliente = new JTextField(10);
+        txtPlacas = new JTextField(10);
+        txtMarca = new JTextField(10);
+        txtModelo = new JTextField(10);
+        txtAnio = new JTextField(10);
 
-        // 2. Formulario
-        JPanel panelFormulario = new JPanel(new GridLayout(6, 2, 10, 15));
-        panelFormulario.setBackground(Color.WHITE);
-        panelFormulario.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
+        colocarComponente(panelForm, new JLabel("ID Cliente:"), 0, 0, gbc);
+        colocarComponente(panelForm, txtIdCliente, 1, 0, gbc);
+        colocarComponente(panelForm, new JLabel("Placas:"), 0, 1, gbc);
+        colocarComponente(panelForm, txtPlacas, 1, 1, gbc);
+        colocarComponente(panelForm, new JLabel("Marca:"), 0, 2, gbc);
+        colocarComponente(panelForm, txtMarca, 1, 2, gbc);
+        colocarComponente(panelForm, new JLabel("Modelo:"), 0, 3, gbc);
+        colocarComponente(panelForm, txtModelo, 1, 3, gbc);
+        colocarComponente(panelForm, new JLabel("Año:"), 0, 4, gbc);
+        colocarComponente(panelForm, txtAnio, 1, 4, gbc);
 
-        panelFormulario.add(new JLabel("Placas del Vehículo:"));
-        txtPlaca = new JTextField();
-        panelFormulario.add(txtPlaca);
+        // --- PANEL DE BOTONES ---
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelBotones.setBackground(Color.WHITE);
 
-        panelFormulario.add(new JLabel("Marca:"));
-        cbMarca = new JComboBox<>(); // Inicializamos vacío
-        panelFormulario.add(cbMarca);
-
-        panelFormulario.add(new JLabel("Modelo:"));
-        cbModelo = new JComboBox<>(); // Inicializamos vacío
-        panelFormulario.add(cbModelo);
-
-        panelFormulario.add(new JLabel("Año:"));
-        cbAnio = new JComboBox<>(); // Inicializamos vacío
-        panelFormulario.add(cbAnio);
-
-        panelFormulario.add(new JLabel("ID del Cliente (Dueño):"));
-        txtIdCliente = new JTextField();
-        panelFormulario.add(txtIdCliente);
-
-        panelFormulario.add(new JLabel("")); 
-        btnGuardar = new JButton("Registrar Vehículo");
-        btnGuardar.setBackground(new Color(52, 152, 219)); 
+        btnGuardar = new JButton("Guardar");
+        btnGuardar.setBackground(new Color(46, 204, 113)); // Verde
         btnGuardar.setForeground(Color.WHITE);
-        btnGuardar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnGuardar.setFocusPainted(false);
-        btnGuardar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelFormulario.add(btnGuardar);
 
-        panelCentro.add(panelFormulario, BorderLayout.NORTH);
+        btnActualizar = new JButton("Actualizar");
+        btnActualizar.setBackground(new Color(52, 152, 219)); // Azul
+        btnActualizar.setForeground(Color.WHITE);
 
-        // 3. Tabla de Vehículos
-        String[] columnas = {"Placa", "Marca", "Modelo", "Año", "ID Cliente"};
-        modeloTabla = new DefaultTableModel(columnas, 0);
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBackground(new Color(231, 76, 60)); // Rojo
+        btnEliminar.setForeground(Color.WHITE);
+
+        panelBotones.add(btnGuardar);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
+
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
+        panelForm.add(panelBotones, gbc);
+
+        add(panelForm, BorderLayout.NORTH);
+
+        // --- PANEL DE TABLA ---
+        modeloTabla = new DefaultTableModel(
+            new String[]{"ID Vehículo", "ID Cliente", "Placas", "Marca", "Modelo", "Año"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+
         tablaVehiculos = new JTable(modeloTabla);
-        tablaVehiculos.setRowHeight(25);
-        tablaVehiculos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        
-        JScrollPane scrollTabla = new JScrollPane(tablaVehiculos);
-        panelCentro.add(scrollTabla, BorderLayout.CENTER);
-
-        add(panelCentro, BorderLayout.CENTER);
+        tablaVehiculos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        add(new JScrollPane(tablaVehiculos), BorderLayout.CENTER);
     }
 
-    // --- NUEVOS GETTERS PARA EL CONTROLADOR ---
-    public JTextField getTxtPlaca() { return txtPlaca; }
-    public JComboBox<String> getCbMarca() { return cbMarca; }
-    public JComboBox<String> getCbModelo() { return cbModelo; }
-    public JComboBox<String> getCbAnio() { return cbAnio; }
+    private void colocarComponente(JPanel p, JComponent c, int x, int y, GridBagConstraints gbc) {
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        p.add(c, gbc);
+    }
+
+    // Getters para el controlador
     public JTextField getTxtIdCliente() { return txtIdCliente; }
+    public JTextField getTxtPlacas() { return txtPlacas; }
+    public JTextField getTxtMarca() { return txtMarca; }
+    public JTextField getTxtModelo() { return txtModelo; }
+    public JTextField getTxtAnio() { return txtAnio; }
     public JButton getBtnGuardar() { return btnGuardar; }
+    public JButton getBtnActualizar() { return btnActualizar; }
+    public JButton getBtnEliminar() { return btnEliminar; }
+    public JTable getTablaVehiculos() { return tablaVehiculos; }
     public DefaultTableModel getModeloTabla() { return modeloTabla; }
 }

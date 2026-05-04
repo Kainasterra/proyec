@@ -37,7 +37,7 @@ public class OrdenTrabajoController implements ActionListener {
         vista.getCbPlacaVehiculo().addItem("Seleccionar Vehículo...");
         
         for (Vehiculo v : listaVehiculosCache) {
-            vista.getCbPlacaVehiculo().addItem(v.getPlaca());
+            vista.getCbPlacaVehiculo().addItem(v.getPlacas());
         }
     }
 
@@ -75,7 +75,7 @@ public class OrdenTrabajoController implements ActionListener {
         String placaSeleccionada = vista.getCbPlacaVehiculo().getSelectedItem().toString();
         Vehiculo vehiculoSeleccionado = null;
         for (Vehiculo v : listaVehiculosCache) {
-            if (v.getPlaca().equals(placaSeleccionada)) {
+            if (v.getPlacas().equals(placaSeleccionada)) {
                 vehiculoSeleccionado = v;
                 break;
             }

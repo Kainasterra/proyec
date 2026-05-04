@@ -1,142 +1,126 @@
 package com.trebol.controller;
 
-import com.trebol.dao.CatalogosDAO;
 import com.trebol.dao.VehiculoDAO;
-import com.trebol.model.Marca;
-import com.trebol.model.Modelo;
 import com.trebol.model.Vehiculo;
 import com.trebol.view.PanelVehiculos;
-import javax.swing.JOptionPane;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
+import java.awt.event.*;
 import java.util.List;
 
-public class VehiculoController {
-    
+public class VehiculoController implements ActionListener {
     private PanelVehiculos vista;
     private VehiculoDAO dao;
+    private int idVehiculoSeleccionado = -1;
 
     public VehiculoController(PanelVehiculos vista, VehiculoDAO dao) {
         this.vista = vista;
         this.dao = dao;
-        
-        configurarComboBoxes(); // Iniciamos la lógica en cascada
-        cargarTabla();
 
-        this.vista.getBtnGuardar().addActionListener(new ActionListener() {
+        // Escuchar botones
+        this.vista.getBtnGuardar().addActionListener(this);
+        this.vista.getBtnActualizar().addActionListener(this);
+        this.vista.getBtnEliminar().addActionListener(this);
+
+        // Escuchar clics en la tabla
+        this.vista.getTablaVehiculos().addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                registrarVehiculo();
+            public void mouseClicked(MouseEvent e) {
+                seleccionarFila();
             }
         });
+
+        listar();
     }
 
-    // --- LÓGICA DE COMBOBOXES EN CASCADA ---
-
-    // Reemplaza tus métodos de configuración en VehiculoController.java:
-
-private void configurarComboBoxes() {
-    CatalogosDAO catDAO = new CatalogosDAO();
-    
-    // 1. Cargar Marcas desde la BD
-    vista.getCbMarca().removeAllItems();
-    vista.getCbMarca().addItem(null); // Opción vacía
-    for (Marca m : catDAO.listarMarcas()) {
-        vista.getCbMarca().addItem(m.getNombre()); // Aquí podrías meter el objeto Marca si quisieras más nivel
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == vista.getBtnGuardar()) registrar();
+        if (e.getSource() == vista.getBtnActualizar()) actualizar();
+        if (e.getSource() == vista.getBtnEliminar()) eliminar();
     }
 
-    // 2. Lógica en cascada para Modelos
-    vista.getCbMarca().addActionListener(e -> {
-        String nombreMarca = (String) vista.getCbMarca().getSelectedItem();
-        actualizarModelosDinamico(nombreMarca);
-    });
-
-    // 3. GENERACIÓN AUTOMÁTICA DE AÑOS (Desde 1990 hasta el actual + 1)
-    vista.getCbAnio().removeAllItems();
-    int anioActual = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-    for (int i = anioActual + 1; i >= 1990; i--) {
-        vista.getCbAnio().addItem(String.valueOf(i));
-    }
-}
-
-private void actualizarModelosDinamico(String nombreMarca) {
-    vista.getCbModelo().removeAllItems();
-    if (nombreMarca == null) return;
-
-    CatalogosDAO catDAO = new CatalogosDAO();
-    // Buscamos el ID de la marca para traer sus modelos
-    int idMarca = 0;
-    for (Marca m : catDAO.listarMarcas()) {
-        if (m.getNombre().equals(nombreMarca)) {
-            idMarca = m.getIdMarca();
-            break;
-        }
-    }
-
-    for (Modelo mod : catDAO.listarModelos(idMarca)) {
-        vista.getCbModelo().addItem(mod.getNombre());
-    }
-}
-
-    // --- LÓGICA DE BASE DE DATOS ---
-
-    private void registrarVehiculo() {
+    private void registrar() {
         try {
-            String placa = vista.getTxtPlaca().getText().trim();
-            int idCliente = Integer.parseInt(vista.getTxtIdCliente().getText().trim());
-            
-            // Validamos que se haya seleccionado algo real
-            if (vista.getCbMarca().getSelectedItem() == null || vista.getCbMarca().getSelectedItem().equals("Seleccione...") ||
-                vista.getCbModelo().getSelectedItem() == null || vista.getCbModelo().getSelectedItem().equals("Seleccione...") ||
-                vista.getCbAnio().getSelectedItem() == null) {
-                
-                JOptionPane.showMessageDialog(vista, "Por favor seleccione Marca, Modelo y Año válidos.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
+            Vehiculo v = extraerDatos();
+            if (dao.registrarVehiculo(v)) {
+                JOptionPane.showMessageDialog(vista, "Vehículo registrado correctamente.");
+                limpiarYCargar();
             }
-
-            String marca = vista.getCbMarca().getSelectedItem().toString();
-            String modelo = vista.getCbModelo().getSelectedItem().toString();
-            int anio = Integer.parseInt(vista.getCbAnio().getSelectedItem().toString());
-
-            if (placa.isEmpty()) {
-                JOptionPane.showMessageDialog(vista, "La placa es obligatoria.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            Vehiculo vehiculo = new Vehiculo(placa, idCliente, marca, modelo, anio);
-
-            if (dao.registrarVehiculo(vehiculo)) {
-                JOptionPane.showMessageDialog(vista, "Vehículo registrado exitosamente.");
-                limpiarCampos();
-                cargarTabla();
-            } else {
-                JOptionPane.showMessageDialog(vista, "Error al guardar (Verifique que el ID Cliente exista).", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(vista, "El ID del cliente debe ser un número entero.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(vista, "Error: ID Cliente y Año deben ser números.");
         }
     }
 
-    private void cargarTabla() {
+    private void actualizar() {
+        if (idVehiculoSeleccionado == -1) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo de la tabla.");
+            return;
+        }
+        try {
+            Vehiculo v = extraerDatos();
+            v.setIdVehiculo(idVehiculoSeleccionado);
+            if (dao.actualizarVehiculo(v)) {
+                JOptionPane.showMessageDialog(vista, "Datos del vehículo actualizados.");
+                limpiarYCargar();
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(vista, "Error: ID Cliente y Año deben ser números.");
+        }
+    }
+
+    private void eliminar() {
+        if (idVehiculoSeleccionado == -1) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo para eliminar.");
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(vista, "¿Eliminar este vehículo?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (dao.eliminarVehiculo(idVehiculoSeleccionado)) {
+                limpiarYCargar();
+            }
+        }
+    }
+
+    private void seleccionarFila() {
+        int fila = vista.getTablaVehiculos().getSelectedRow();
+        if (fila != -1) {
+            idVehiculoSeleccionado = (int) vista.getModeloTabla().getValueAt(fila, 0);
+            vista.getTxtIdCliente().setText(vista.getModeloTabla().getValueAt(fila, 1).toString());
+            vista.getTxtPlacas().setText(vista.getModeloTabla().getValueAt(fila, 2).toString());
+            vista.getTxtMarca().setText(vista.getModeloTabla().getValueAt(fila, 3).toString());
+            vista.getTxtModelo().setText(vista.getModeloTabla().getValueAt(fila, 4).toString());
+            vista.getTxtAnio().setText(vista.getModeloTabla().getValueAt(fila, 5).toString());
+        }
+    }
+
+    private void listar() {
         vista.getModeloTabla().setRowCount(0);
         List<Vehiculo> lista = dao.listarVehiculos();
-        
         for (Vehiculo v : lista) {
-            Object[] fila = {
-                v.getPlaca(),
-                v.getMarca(),
-                v.getModelo(),
-                v.getAnio(),
-                v.getIdCliente()
-            };
-            vista.getModeloTabla().addRow(fila);
+            vista.getModeloTabla().addRow(new Object[]{
+                v.getIdVehiculo(), v.getIdCliente(), v.getPlacas(), v.getMarca(), v.getModelo(), v.getAnio()
+            });
         }
     }
 
-    private void limpiarCampos() {
-        vista.getTxtPlaca().setText("");
+    private Vehiculo extraerDatos() {
+        return new Vehiculo(
+            Integer.parseInt(vista.getTxtIdCliente().getText()),
+            vista.getTxtPlacas().getText(),
+            vista.getTxtMarca().getText(),
+            vista.getTxtModelo().getText(),
+            Integer.parseInt(vista.getTxtAnio().getText())
+        );
+    }
+
+    private void limpiarYCargar() {
         vista.getTxtIdCliente().setText("");
-        vista.getCbMarca().setSelectedIndex(0); // Resetea el combo en cascada
+        vista.getTxtPlacas().setText("");
+        vista.getTxtMarca().setText("");
+        vista.getTxtModelo().setText("");
+        vista.getTxtAnio().setText("");
+        idVehiculoSeleccionado = -1;
+        vista.getTablaVehiculos().clearSelection();
+        listar();
     }
 }
