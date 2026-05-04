@@ -15,6 +15,7 @@ public class ServicioMuelleController {
     public ServicioMuelleController(PanelMuelles vista, ServicioMuelleDAO dao) {
         this.vista = vista;
         this.dao = dao;
+        cargarTabla();
         
         // 1. "Escuchar" el clic del botón guardar
         this.vista.getBtnGuardar().addActionListener(new ActionListener() {
@@ -48,6 +49,7 @@ public class ServicioMuelleController {
             if (dao.registrarServicio(servicio)) {
                 JOptionPane.showMessageDialog(vista, "¡Servicio registrado exitosamente en la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 limpiarCampos();
+                cargarTabla();
             } else {
                 JOptionPane.showMessageDialog(vista, "Error al guardar en la base de datos. Verifica la conexión.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -64,5 +66,24 @@ public class ServicioMuelleController {
         vista.getTxtDetalles().setText("");
         vista.getTxtPiezas().setText("");
         vista.getTxtTecnico().setText("");
+    }
+    // Método para llenar la tabla de la vista con los datos de la base
+    private void cargarTabla() {
+        // 1. Limpiamos la tabla por si tenía datos viejos
+        vista.getModeloTabla().setRowCount(0); 
+        
+        // 2. Pedimos los datos al DAO
+        java.util.List<ServicioMuelle> lista = dao.listarTodos();
+        
+        // 3. Recorremos la lista y agregamos fila por fila
+        for (ServicioMuelle s : lista) {
+            Object[] fila = {
+                s.getIdMuelle(),
+                s.getIdOrden(),
+                s.getTipoReparacion(),
+                s.getTecnicoResponsable()
+            };
+            vista.getModeloTabla().addRow(fila);
+        }
     }
 }
