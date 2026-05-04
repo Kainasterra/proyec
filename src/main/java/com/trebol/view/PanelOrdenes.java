@@ -13,7 +13,8 @@ public class PanelOrdenes extends JPanel {
     private JTextField txtCostoRefacciones;
     private JComboBox<String> cbEstatus;
     private JButton btnGenerarOrden;
-    
+    private JButton btnActualizar;
+
     // Componentes de la tabla
     private JTable tablaOrdenes;
     private DefaultTableModel modeloTabla;
@@ -47,25 +48,35 @@ public class PanelOrdenes extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Fila 1: Vehículo y Estatus
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.5;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
         panelFormulario.add(new JLabel("Vehículo (Placa):"), gbc);
-        
-        gbc.gridx = 1; gbc.gridy = 0;
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         panelFormulario.add(new JLabel("Estatus actual:"), gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         cbPlacaVehiculo = new JComboBox<>();
         panelFormulario.add(cbPlacaVehiculo, gbc);
 
-        gbc.gridx = 1; gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         cbEstatus = new JComboBox<>(new String[]{"en proceso", "pendiente", "finalizado", "entregado"});
         panelFormulario.add(cbEstatus, gbc);
 
         // Fila 2: Descripción del problema
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
         panelFormulario.add(new JLabel("Descripción del Problema / Servicio a realizar:"), gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; gbc.ipady = 40;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.ipady = 40;
         txtDescripcionProblema = new JTextArea();
         txtDescripcionProblema.setLineWrap(true);
         txtDescripcionProblema.setWrapStyleWord(true);
@@ -73,31 +84,53 @@ public class PanelOrdenes extends JPanel {
         panelFormulario.add(scrollDescripcion, gbc);
 
         // Fila 3: Costos
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1; gbc.ipady = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
         panelFormulario.add(new JLabel("Costo Mano de Obra ($):"), gbc);
 
-        gbc.gridx = 1; gbc.gridy = 4;
+        gbc.gridx = 1;
+        gbc.gridy = 4;
         panelFormulario.add(new JLabel("Costo Refacciones ($):"), gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         txtCostoManoObra = new JTextField("0.00");
         panelFormulario.add(txtCostoManoObra, gbc);
 
-        gbc.gridx = 1; gbc.gridy = 5;
+        gbc.gridx = 1;
+        gbc.gridy = 5;
         txtCostoRefacciones = new JTextField("0.00");
         panelFormulario.add(txtCostoRefacciones, gbc);
 
-        // Fila 4: Botón
+        // --- SECCIÓN DE BOTONES ---
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
-        btnGenerarOrden = new JButton("Generar Orden de Trabajo");
+        
+        // Creamos un panel pequeño para contener ambos botones
+        JPanel panelBotones = new JPanel(new GridLayout(1, 2, 10, 0));
+        panelBotones.setBackground(Color.WHITE); // Para que no se vea gris
+
+        // Botón Generar (Ya lo tienes, asegúrate que se llame así)
+        btnGenerarOrden = new JButton("Generar Orden");
         btnGenerarOrden.setBackground(new Color(46, 204, 113));
         btnGenerarOrden.setForeground(Color.WHITE);
         btnGenerarOrden.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnGenerarOrden.setFocusPainted(false);
         btnGenerarOrden.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelFormulario.add(btnGenerarOrden, gbc);
 
-        panelCentro.add(panelFormulario, BorderLayout.NORTH);
+        // Botón Actualizar (EL QUE FALTA)
+        btnActualizar = new JButton("Actualizar Orden");
+        btnActualizar.setBackground(new Color(52, 152, 219)); // Color Azul
+        btnActualizar.setForeground(Color.WHITE);
+        btnActualizar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnActualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Agregamos los botones al panel pequeño
+        panelBotones.add(btnGenerarOrden);
+        panelBotones.add(btnActualizar);
+
+        // Agregamos el panel de botones al formulario principal
+        panelFormulario.add(panelBotones, gbc);
 
         // Tabla actualizada
         String[] columnas = {"ID Orden", "Placa", "Fecha Ingreso", "Estatus", "Mano de Obra", "Refacciones"};
@@ -105,7 +138,7 @@ public class PanelOrdenes extends JPanel {
         tablaOrdenes = new JTable(modeloTabla);
         tablaOrdenes.setRowHeight(25);
         tablaOrdenes.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        
+
         JScrollPane scrollTabla = new JScrollPane(tablaOrdenes);
         panelCentro.add(scrollTabla, BorderLayout.CENTER);
 
@@ -113,11 +146,39 @@ public class PanelOrdenes extends JPanel {
     }
 
     // --- GETTERS ---
-    public JComboBox<String> getCbPlacaVehiculo() { return cbPlacaVehiculo; }
-    public JTextArea getTxtDescripcionProblema() { return txtDescripcionProblema; }
-    public JTextField getTxtCostoManoObra() { return txtCostoManoObra; }
-    public JTextField getTxtCostoRefacciones() { return txtCostoRefacciones; }
-    public JComboBox<String> getCbEstatus() { return cbEstatus; }
-    public JButton getBtnGenerarOrden() { return btnGenerarOrden; }
-    public DefaultTableModel getModeloTabla() { return modeloTabla; }
+    public JComboBox<String> getCbPlacaVehiculo() {
+        return cbPlacaVehiculo;
+    }
+
+    public JTextArea getTxtDescripcionProblema() {
+        return txtDescripcionProblema;
+    }
+
+    public JTextField getTxtCostoManoObra() {
+        return txtCostoManoObra;
+    }
+
+    public JTextField getTxtCostoRefacciones() {
+        return txtCostoRefacciones;
+    }
+
+    public JComboBox<String> getCbEstatus() {
+        return cbEstatus;
+    }
+
+    public JButton getBtnGenerarOrden() {
+        return btnGenerarOrden;
+    }
+
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
+    }
+
+    public JButton getBtnActualizar() {
+        return btnActualizar;
+    }
+
+    public JTable getTablaOrdenes() {
+        return tablaOrdenes;
+    }
 }
