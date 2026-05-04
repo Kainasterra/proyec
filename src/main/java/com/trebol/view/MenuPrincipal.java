@@ -93,8 +93,7 @@ public class MenuPrincipal {
         
         // El controlador ahora recibe AMBOS DAOs
         com.trebol.controller.ServicioMuelleController controllerMuelles = 
-            new com.trebol.controller.ServicioMuelleController(panelMuelles, daoMuelles, daoInventario);
-        
+new com.trebol.controller.ServicioMuelleController(panelMuelles, daoMuelles, daoInventario, new com.trebol.dao.OrdenTrabajoDAO());        
         panelContenido.add(panelMuelles, "Muelles");
         // Agregamos la vista al panel contenedor
         panelContenido.add(panelMuelles, "Muelles");        // 5. AGREGAR ACCIONES A LOS BOTONES (La Magia)

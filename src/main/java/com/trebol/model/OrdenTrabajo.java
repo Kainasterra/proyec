@@ -4,7 +4,7 @@ public class OrdenTrabajo {
     private int idOrden;
     private int idCliente;
     private int idVehiculo;
-    private String placaVehiculo; // Solo para mostrar en la tabla de la interfaz
+    private String placaVehiculo; // Auxiliar para la tabla
     private String fechaIngreso;
     private String fechaEntregaEstimada;
     private String estatus;
@@ -13,19 +13,27 @@ public class OrdenTrabajo {
     private double costoManoObra;
     private double costoRefacciones;
 
+    // Constructor vacío
     public OrdenTrabajo() {}
 
-    // Constructor para registrar una nueva orden
-    public OrdenTrabajo(int idCliente, int idVehiculo, String estatus, String descripcionProblema, double costoManoObra, double costoRefacciones) {
+    // Constructor para Listar (Todos los campos)
+    public OrdenTrabajo(int idOrden, int idCliente, int idVehiculo, String placaVehiculo, String fechaIngreso, 
+                        String fechaEntregaEstimada, String estatus, String diagnosticoTecnico, 
+                        String descripcionProblema, double costoManoObra, double costoRefacciones) {
+        this.idOrden = idOrden;
         this.idCliente = idCliente;
         this.idVehiculo = idVehiculo;
+        this.placaVehiculo = placaVehiculo;
+        this.fechaIngreso = fechaIngreso;
+        this.fechaEntregaEstimada = fechaEntregaEstimada;
         this.estatus = estatus;
+        this.diagnosticoTecnico = diagnosticoTecnico;
         this.descripcionProblema = descripcionProblema;
         this.costoManoObra = costoManoObra;
         this.costoRefacciones = costoRefacciones;
     }
 
-    // --- GETTERS Y SETTERS ---
+    // Getters y Setters
     public int getIdOrden() { return idOrden; }
     public void setIdOrden(int idOrden) { this.idOrden = idOrden; }
 
