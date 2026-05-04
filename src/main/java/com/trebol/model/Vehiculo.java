@@ -1,30 +1,37 @@
 package com.trebol.model;
 
 public class Vehiculo {
-    
+
     private int idVehiculo;
-    private int idCliente; // Llave foránea para vincularlo a su dueño
+    private int idCliente;
+    private String placa;
     private String marca;
     private String modelo;
-    private String placas;
     private int anio;
 
-    // Constructor vacío
     public Vehiculo() {
     }
 
-    // Constructor con parámetros
-    public Vehiculo(int idVehiculo, int idCliente, String marca, String modelo, String placas, int anio) {
+    // Constructor completo
+    public Vehiculo(int idVehiculo, int idCliente, String placa, String marca, String modelo, int anio) {
         this.idVehiculo = idVehiculo;
         this.idCliente = idCliente;
+        this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
-        this.placas = placas;
         this.anio = anio;
     }
 
-    // --- GETTERS Y SETTERS ---
+    // Constructor sin ID (El que pide el error 106,33)
+    public Vehiculo(String placa, int idCliente, String marca, String modelo, int anio) {
+        this.placa = placa;
+        this.idCliente = idCliente;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.anio = anio;
+    }
 
+    // Getters y Setters
     public int getIdVehiculo() {
         return idVehiculo;
     }
@@ -41,6 +48,14 @@ public class Vehiculo {
         this.idCliente = idCliente;
     }
 
+    public String getPlaca() {
+        return placa;
+    } // ESTE ES EL QUE FALTA
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
+    }
+
     public String getMarca() {
         return marca;
     }
@@ -55,14 +70,6 @@ public class Vehiculo {
 
     public void setModelo(String modelo) {
         this.modelo = modelo;
-    }
-
-    public String getPlacas() {
-        return placas;
-    }
-
-    public void setPlacas(String placas) {
-        this.placas = placas;
     }
 
     public int getAnio() {
