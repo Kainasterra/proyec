@@ -104,33 +104,35 @@ public class PanelOrdenes extends JPanel {
         txtCostoRefacciones = new JTextField("0.00");
         panelFormulario.add(txtCostoRefacciones, gbc);
 
-        // --- SECCIÓN DE BOTONES ---
-        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
+        // Fila 4: Botón
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        gbc.ipady = 0;
         
-        // Creamos un panel pequeño para contener ambos botones
         JPanel panelBotones = new JPanel(new GridLayout(1, 2, 10, 0));
-        panelBotones.setBackground(Color.WHITE); // Para que no se vea gris
-
-        // Botón Generar (Ya lo tienes, asegúrate que se llame así)
-        btnGenerarOrden = new JButton("Generar Orden");
+        panelBotones.setBackground(Color.WHITE);
+        
+       // Botón Generar Orden
+        btnGenerarOrden = new JButton("Generar Orden de Trabajo");
         btnGenerarOrden.setBackground(new Color(46, 204, 113));
         btnGenerarOrden.setForeground(Color.WHITE);
         btnGenerarOrden.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnGenerarOrden.setFocusPainted(false);
         btnGenerarOrden.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Botón Actualizar (EL QUE FALTA)
+       // Botón Actualizar Orden
         btnActualizar = new JButton("Actualizar Orden");
-        btnActualizar.setBackground(new Color(52, 152, 219)); // Color Azul
+        btnActualizar.setBackground(new Color(52, 152, 219)); // Azul
         btnActualizar.setForeground(Color.WHITE);
         btnActualizar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnActualizar.setFocusPainted(false);
         btnActualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Agregamos los botones al panel pequeño
         panelBotones.add(btnGenerarOrden);
         panelBotones.add(btnActualizar);
-
-        // Agregamos el panel de botones al formulario principal
         panelFormulario.add(panelBotones, gbc);
+        panelCentro.add(panelFormulario, BorderLayout.NORTH);
 
         // Tabla actualizada
         String[] columnas = {"ID Orden", "Placa", "Fecha Ingreso", "Estatus", "Mano de Obra", "Refacciones"};
