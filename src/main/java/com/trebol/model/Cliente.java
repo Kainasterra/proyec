@@ -2,22 +2,23 @@ package com.trebol.model;
 
 public class Cliente {
     
-    // Atributos que coinciden con la información requerida
     private int idCliente;
     private String nombre;
     private String telefono;
     private String correo;
+    private String direccion; // <-- Aquí está el atributo que nos faltaba
 
-    // Constructor vacío (obligatorio para muchos frameworks y operaciones)
+    // Constructor vacío
     public Cliente() {
     }
 
-    // Constructor con parámetros (para crear objetos Cliente rápidamente)
-    public Cliente(int idCliente, String nombre, String telefono, String correo) {
+    // Constructor con todos los parámetros (Ahora son 5)
+    public Cliente(int idCliente, String nombre, String telefono, String correo, String direccion) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.telefono = telefono;
         this.correo = correo;
+        this.direccion = direccion;
     }
 
     // --- GETTERS Y SETTERS ---
@@ -52,5 +53,13 @@ public class Cliente {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 }

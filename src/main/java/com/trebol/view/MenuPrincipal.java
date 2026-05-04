@@ -59,13 +59,13 @@ public class MenuPrincipal {
         // 4. CREAR LAS "CARTAS" (PANTALLAS) TEMPORALES
         panelContenido.add(crearPanelDemo("Pantalla de Inicio", "Bienvenido al Sistema"), "Inicio");
         
-        // Instancia de Vista y DAO de Clientes
-     PanelClientes panelClientes = new PanelClientes();
-     com.trebol.dao.ClienteDAO daoClientes = new com.trebol.dao.ClienteDAO();
-     // (El controlador lo agregaremos en el siguiente paso)
-
-     panelContenido.add(panelClientes, "Clientes");
+       // Instancia de Vista, DAO y Controlador de Clientes
+        PanelClientes panelClientes = new PanelClientes();
+        com.trebol.dao.ClienteDAO daoClientes = new com.trebol.dao.ClienteDAO();
+        com.trebol.controller.ClienteController controllerClientes = 
+            new com.trebol.controller.ClienteController(panelClientes, daoClientes); // NUEVA LÍNEA
         
+        panelContenido.add(panelClientes, "Clientes");
         
         
         panelContenido.add(crearPanelDemo("Gestión de Vehículos", "Aquí irá la tabla de vehículos"), "Vehiculos");
