@@ -68,8 +68,24 @@ public class MenuPrincipal {
         panelContenido.add(panelClientes, "Clientes");
         
         
-        panelContenido.add(crearPanelDemo("Gestión de Vehículos", "Aquí irá la tabla de vehículos"), "Vehiculos");
-        panelContenido.add(crearPanelDemo("Órdenes de Trabajo", "Aquí gestionaremos los servicios"), "Ordenes");
+     // Instancia de Vista, DAO y Controlador de Vehículos
+        PanelVehiculos panelVehiculos = new PanelVehiculos();
+        com.trebol.dao.VehiculoDAO daoVehiculos = new com.trebol.dao.VehiculoDAO();
+        com.trebol.controller.VehiculoController controllerVehiculos = 
+            new com.trebol.controller.VehiculoController(panelVehiculos, daoVehiculos); // NUEVA LÍNEA
+        
+        panelContenido.add(panelVehiculos, "Vehiculos");
+        
+        
+// Instancia de Vista, DAOs y Controlador de Órdenes de Trabajo
+        PanelOrdenes panelOrdenes = new PanelOrdenes();
+        com.trebol.dao.OrdenTrabajoDAO ordenDAO = new com.trebol.dao.OrdenTrabajoDAO();
+        com.trebol.dao.VehiculoDAO vehiculoDAO = new com.trebol.dao.VehiculoDAO();
+        com.trebol.controller.OrdenTrabajoController ordenController = new com.trebol.controller.OrdenTrabajoController(panelOrdenes, ordenDAO, vehiculoDAO);
+        
+        panelContenido.add(panelOrdenes, "Ordenes");      
+        
+        
 // Instancias de Vistas y DAOs
         PanelMuelles panelMuelles = new PanelMuelles();
         com.trebol.dao.ServicioMuelleDAO daoMuelles = new com.trebol.dao.ServicioMuelleDAO();
