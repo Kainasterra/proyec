@@ -1,6 +1,7 @@
 package com.trebol.controller;
 
 import com.trebol.dao.ServicioMuelleDAO;
+import com.trebol.dao.InventarioDAO; // IMPORTANTE
 import com.trebol.model.ServicioMuelle;
 import com.trebol.view.PanelMuelles;
 import javax.swing.JOptionPane;
@@ -11,13 +12,16 @@ public class ServicioMuelleController {
     
     private PanelMuelles vista;
     private ServicioMuelleDAO dao;
+    private InventarioDAO inventarioDao; // Nueva dependencia
 
-    public ServicioMuelleController(PanelMuelles vista, ServicioMuelleDAO dao) {
+    // Actualizamos el constructor para recibir el InventarioDAO
+    public ServicioMuelleController(PanelMuelles vista, ServicioMuelleDAO dao, InventarioDAO inventarioDao) {
         this.vista = vista;
         this.dao = dao;
-        cargarTabla();
+        this.inventarioDao = inventarioDao;
         
-        // 1. "Escuchar" el clic del botón guardar
+        cargarTabla();
+
         this.vista.getBtnGuardar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -26,36 +30,49 @@ public class ServicioMuelleController {
         });
     }
 
-    // 2. Lógica para guardar el servicio
     private void registrarServicio() {
         try {
-            // A. Extraer los datos de las cajas de texto de la vista
             int idOrden = Integer.parseInt(vista.getTxtIdOrden().getText().trim());
             String tipo = vista.getCbTipoReparacion().getSelectedItem().toString();
             String detalles = vista.getTxtDetalles().getText().trim();
-            String piezas = vista.getTxtPiezas().getText().trim();
+            String idPiezaStr = vista.getTxtPiezas().getText().trim(); // ID de la refacción
             String tecnico = vista.getTxtTecnico().getText().trim();
 
-            // Validar que los campos no estén vacíos
             if (detalles.isEmpty() || tecnico.isEmpty()) {
-                JOptionPane.showMessageDialog(vista, "Por favor, llena los campos de detalles y técnico.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(vista, "Llene los campos obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // B. Empaquetarlos en el Modelo
-            ServicioMuelle servicio = new ServicioMuelle(0, idOrden, tipo, detalles, piezas, tecnico);
+            ServicioMuelle servicio = new ServicioMuelle(0, idOrden, tipo, detalles, idPiezaStr, tecnico);
 
-            // C. Enviarlos al DAO para guardarlos en MariaDB
+            // 1. Intentamos registrar el servicio en Muelles
             if (dao.registrarServicio(servicio)) {
-                JOptionPane.showMessageDialog(vista, "¡Servicio registrado exitosamente en la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                
+                // 2. LÓGICA DE INVENTARIO: Si se especificó una pieza, la descontamos
+                if (!idPiezaStr.isEmpty()) {
+                    try {
+                        int idPieza = Integer.parseInt(idPiezaStr);
+                        // Descontamos 1 unidad por defecto
+                        if (inventarioDao.descontarStock(idPieza, 1)) {
+                            JOptionPane.showMessageDialog(vista, "Servicio registrado y pieza descontada del inventario.");
+                        } else {
+                            JOptionPane.showMessageDialog(vista, "Servicio registrado, pero NO se pudo descontar la pieza (Stock insuficiente o ID inválido).", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        JOptionPane.showMessageDialog(vista, "ID de pieza inválido. No se descontó del inventario.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(vista, "Servicio registrado exitosamente.");
+                }
+
                 limpiarCampos();
                 cargarTabla();
             } else {
-                JOptionPane.showMessageDialog(vista, "Error al guardar en la base de datos. Verifica la conexión.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(vista, "Error al guardar el servicio.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(vista, "El ID de la Orden debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(vista, "ID de Orden debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
