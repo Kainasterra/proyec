@@ -13,7 +13,7 @@ Este es un sistema de escritorio (Desktop) desarrollado en Java para la gestión
 
 ## 🛠️ Tecnologías utilizadas
 
-- **Lenguaje:** Java 17+
+- **Lenguaje:** Java 17+ (with Maven, no Ant)
 - **Gestor de Dependencias:** Maven
 - **Base de Datos:** MariaDB
 - **Interfaz Gráfica:** Swing (MVC - Modelo Vista Controlador)
