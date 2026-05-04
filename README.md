@@ -52,9 +52,6 @@ Para contribuir al proyecto:
 3. Sube tus cambios: `git push origin feat-nueva-mejora-hojalateria`.
 4. Abre un Pull Request para revisión.
 
----
-© 2026 Multiservicios Trébol - Desarrollo Profesional de Software.
-```
-   ```
 
-¿Te gustaría que también cree este README en un documento de Google para que lo tengan como referencia externa, o con esto para GitHub es suficiente?it](https://github.com/tu-usuario/MultiserviciosTrebol.git)
+© 2026 Multiservicios Trébol - Desarrollo Profesional de Software.
+
