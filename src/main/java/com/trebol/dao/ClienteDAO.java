@@ -38,8 +38,8 @@ public class ClienteDAO {
                     rs.getInt("id_cliente"),
                     rs.getString("nombre"),
                     rs.getString("telefono"),
-                    rs.getString("correo"),
-                        ""
+                    rs.getString("correo")
+                        
                 );
                 lista.add(c);
             }

@@ -10,18 +10,18 @@ import java.util.List;
 public class ClienteController implements ActionListener {
     private PanelClientes vista;
     private ClienteDAO dao;
-    private int idClienteSeleccionado = -1; // Almacena el ID del cliente que estamos editando
+    private int idClienteSeleccionado = -1;
 
     public ClienteController(PanelClientes vista, ClienteDAO dao) {
         this.vista = vista;
         this.dao = dao;
 
-        // 1. Escuchar los clics de los botones
+        // Listeners de botones
         this.vista.getBtnGuardar().addActionListener(this);
         this.vista.getBtnActualizar().addActionListener(this);
         this.vista.getBtnEliminar().addActionListener(this);
 
-        // 2. Escuchar clics en la tabla para cargar datos
+        // Listener para la tabla
         this.vista.getTablaClientes().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -29,8 +29,22 @@ public class ClienteController implements ActionListener {
             }
         });
 
-        // 3. Mostrar los datos iniciales
-        listarClientes();
+        // --- NUEVO: Listener para el Buscador (Tiempo Real) ---
+        this.vista.getTxtBuscar().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                filtrar();
+            }
+        });
+
+        listar();
+    }
+
+    // Método que realiza la magia del filtrado
+    private void filtrar() {
+        String texto = vista.getTxtBuscar().getText();
+        // (?i) hace que sea insensible a mayúsculas/minúsculas
+        vista.getSorter().setRowFilter(RowFilter.regexFilter("(?i)" + texto));
     }
 
     @Override
@@ -41,42 +55,43 @@ public class ClienteController implements ActionListener {
     }
 
     private void registrar() {
-        if (validarCampos()) {
-            Cliente c = extraerDatos();
-            if (dao.registrarCliente(c)) {
-                JOptionPane.showMessageDialog(vista, "¡Cliente guardado con éxito!");
-                limpiarYCargar();
-            }
+        Cliente c = new Cliente(
+            vista.getTxtNombre().getText(),
+            vista.getTxtTelefono().getText(),
+            vista.getTxtCorreo().getText()
+        );
+        if (dao.registrarCliente(c)) {
+            JOptionPane.showMessageDialog(vista, "Cliente guardado.");
+            limpiarYCargar();
         }
     }
 
     private void actualizar() {
-    if (idClienteSeleccionado == -1) {
-        JOptionPane.showMessageDialog(vista, "Selecciona un cliente de la tabla.");
-        return;
-    }
-    
-    // CREAMOS EL OBJETO
-    Cliente c = extraerDatos();
-    // ¡ESTA LÍNEA ES VITAL! Sin ella, el ID que se envía es 0 o nulo
-    c.setIdCliente(idClienteSeleccionado); 
-    
-    if (dao.actualizarCliente(c)) {
-        JOptionPane.showMessageDialog(vista, "¡Cliente actualizado!");
-        limpiarYCargar();
-    }
-}
-    private void eliminar() {
         if (idClienteSeleccionado == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un cliente para eliminar.");
+            JOptionPane.showMessageDialog(vista, "Selecciona un cliente de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(vista, "¿Eliminar este cliente?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        Cliente c = new Cliente(
+            idClienteSeleccionado,
+            vista.getTxtNombre().getText(),
+            vista.getTxtTelefono().getText(),
+            vista.getTxtCorreo().getText()
+        );
+        if (dao.actualizarCliente(c)) {
+            JOptionPane.showMessageDialog(vista, "Cliente actualizado.");
+            limpiarYCargar();
+        }
+    }
+
+    private void eliminar() {
+        if (idClienteSeleccionado == -1) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un cliente.");
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(vista, "¿Eliminar cliente?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             if (dao.eliminarCliente(idClienteSeleccionado)) {
                 limpiarYCargar();
-            } else {
-                JOptionPane.showMessageDialog(vista, "No se puede eliminar (revisa si tiene vehículos asociados).");
             }
         }
     }
@@ -84,46 +99,33 @@ public class ClienteController implements ActionListener {
     private void seleccionarFila() {
         int fila = vista.getTablaClientes().getSelectedRow();
         if (fila != -1) {
-            idClienteSeleccionado = (int) vista.getModeloTabla().getValueAt(fila, 0);
-            vista.getTxtNombre().setText(vista.getModeloTabla().getValueAt(fila, 1).toString());
-            vista.getTxtTelefono().setText(vista.getModeloTabla().getValueAt(fila, 2).toString());
-            vista.getTxtCorreo().setText(vista.getModeloTabla().getValueAt(fila, 3).toString());
+            // Importante: convertir el índice de la vista al modelo por si hay filtro activo
+            int filaModelo = vista.getTablaClientes().convertRowIndexToModel(fila);
+            
+            idClienteSeleccionado = (int) vista.getModeloTabla().getValueAt(filaModelo, 0);
+            vista.getTxtNombre().setText(vista.getModeloTabla().getValueAt(filaModelo, 1).toString());
+            vista.getTxtTelefono().setText(vista.getModeloTabla().getValueAt(filaModelo, 2).toString());
+            vista.getTxtCorreo().setText(vista.getModeloTabla().getValueAt(filaModelo, 3).toString());
         }
     }
 
-    private void listarClientes() {
+    private void listar() {
         vista.getModeloTabla().setRowCount(0);
         List<Cliente> lista = dao.listarClientes();
         for (Cliente c : lista) {
             vista.getModeloTabla().addRow(new Object[]{
-                c.getIdCliente(), c.getNombre(), c.getTelefono(), c.getCorreo(), c.getDireccion()
+                c.getIdCliente(), c.getNombre(), c.getTelefono(), c.getCorreo()
             });
         }
-    }
-
-    private Cliente extraerDatos() {
-        return new Cliente(
-            vista.getTxtNombre().getText(),
-            vista.getTxtTelefono().getText(),
-            vista.getTxtCorreo().getText(),
-                ""
-        );
-    }
-
-    private boolean validarCampos() {
-        if (vista.getTxtNombre().getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(vista, "El nombre es obligatorio.");
-            return false;
-        }
-        return true;
     }
 
     private void limpiarYCargar() {
         vista.getTxtNombre().setText("");
         vista.getTxtTelefono().setText("");
         vista.getTxtCorreo().setText("");
+        vista.getTxtBuscar().setText(""); // Limpiar buscador
+        vista.getSorter().setRowFilter(null); // Quitar filtro
         idClienteSeleccionado = -1;
-        vista.getTablaClientes().clearSelection();
-        listarClientes();
+        listar();
     }
 }

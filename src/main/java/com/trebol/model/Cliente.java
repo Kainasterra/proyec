@@ -5,26 +5,26 @@ public class Cliente {
     private String nombre;
     private String telefono;
     private String correo;
-    private String direccion;
+
 
     // 1. Constructor Vacío
     public Cliente() {}
 
     // 2. Constructor Completo (Con ID) - Útil para listar y actualizar
-    public Cliente(int idCliente, String nombre, String telefono, String correo, String direccion) {
+    public Cliente(int idCliente, String nombre, String telefono, String correo) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.telefono = telefono;
         this.correo = correo;
-        this.direccion = direccion;
+    
     }
 
     // 3. Constructor de Registro (Sin ID) - Útil para el guardado inicial
-    public Cliente(String nombre, String telefono, String correo, String direccion) {
+    public Cliente(String nombre, String telefono, String correo) {
         this.nombre = nombre;
         this.telefono = telefono;
         this.correo = correo;
-        this.direccion = direccion;
+    
     }
 
     // Getters y Setters
@@ -40,6 +40,5 @@ public class Cliente {
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
 
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
+  
 }

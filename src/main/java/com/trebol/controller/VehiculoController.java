@@ -19,12 +19,21 @@ public class VehiculoController implements ActionListener {
         this.vista = vista;
         this.dao = dao;
 
-        // --- Registro de Listeners ---
+        // Listeners de botones
         this.vista.getBtnGuardar().addActionListener(this);
         this.vista.getBtnActualizar().addActionListener(this);
         this.vista.getBtnEliminar().addActionListener(this);
-        this.vista.getBtnRefrescarCombo().addActionListener(this); // Nuevo listener
+        this.vista.getBtnRefrescarCombo().addActionListener(this);
 
+        // --- NUEVO: Listener para el Buscador ---
+        this.vista.getTxtBuscar().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                filtrar();
+            }
+        });
+
+        // Listener para la tabla
         this.vista.getTablaVehiculos().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -32,18 +41,14 @@ public class VehiculoController implements ActionListener {
             }
         });
 
-        // Carga inicial
         cargarComboClientes();
         listar();
     }
 
-    private void cargarComboClientes() {
-        vista.getCbClientes().removeAllItems();
-        ClienteDAO cDao = new ClienteDAO();
-        List<Cliente> lista = cDao.listarClientes();
-        for (Cliente c : lista) {
-            vista.getCbClientes().addItem(new ComboItem(c.getIdCliente(), c.getNombre()));
-        }
+    private void filtrar() {
+        String texto = vista.getTxtBuscar().getText();
+        // Filtra por cualquier columna (Placas, Marca, Modelo, etc.)
+        vista.getSorter().setRowFilter(RowFilter.regexFilter("(?i)" + texto));
     }
 
     @Override
@@ -51,11 +56,9 @@ public class VehiculoController implements ActionListener {
         if (e.getSource() == vista.getBtnGuardar()) registrar();
         if (e.getSource() == vista.getBtnActualizar()) actualizar();
         if (e.getSource() == vista.getBtnEliminar()) eliminar();
-        
-        // Acción del botón refrescar
         if (e.getSource() == vista.getBtnRefrescarCombo()) {
             cargarComboClientes();
-            JOptionPane.showMessageDialog(vista, "Lista de clientes sincronizada.");
+            JOptionPane.showMessageDialog(vista, "Lista de clientes actualizada.");
         }
     }
 
@@ -63,37 +66,37 @@ public class VehiculoController implements ActionListener {
         try {
             Vehiculo v = extraerDatos();
             if (dao.registrarVehiculo(v)) {
-                JOptionPane.showMessageDialog(vista, "Vehículo registrado con éxito.");
+                JOptionPane.showMessageDialog(vista, "Vehículo registrado.");
                 limpiarYCargar();
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(vista, "Error al registrar: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error: " + ex.getMessage());
         }
     }
 
     private void actualizar() {
         if (idVehiculoSeleccionado == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo de la tabla para editar.");
+            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo de la tabla.");
             return;
         }
         try {
             Vehiculo v = extraerDatos();
             v.setIdVehiculo(idVehiculoSeleccionado);
             if (dao.actualizarVehiculo(v)) {
-                JOptionPane.showMessageDialog(vista, "Vehículo actualizado correctamente.");
+                JOptionPane.showMessageDialog(vista, "Vehículo actualizado.");
                 limpiarYCargar();
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(vista, "Error al actualizar: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error: " + ex.getMessage());
         }
     }
 
     private void eliminar() {
         if (idVehiculoSeleccionado == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo para eliminar.");
+            JOptionPane.showMessageDialog(vista, "Selecciona un vehículo.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(vista, "¿Deseas eliminar este vehículo?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(vista, "¿Eliminar vehículo?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             if (dao.eliminarVehiculo(idVehiculoSeleccionado)) {
                 limpiarYCargar();
@@ -104,10 +107,13 @@ public class VehiculoController implements ActionListener {
     private void seleccionarFila() {
         int fila = vista.getTablaVehiculos().getSelectedRow();
         if (fila != -1) {
-            idVehiculoSeleccionado = (int) vista.getModeloTabla().getValueAt(fila, 0);
-            int idClienteEnTabla = (int) vista.getModeloTabla().getValueAt(fila, 1);
+            // CRÍTICO: Convertir el índice de la vista al modelo por si hay filtro activo
+            int filaModelo = vista.getTablaVehiculos().convertRowIndexToModel(fila);
             
-            // Sincronizar el ComboBox con el ID de la tabla
+            idVehiculoSeleccionado = (int) vista.getModeloTabla().getValueAt(filaModelo, 0);
+            int idClienteEnTabla = (int) vista.getModeloTabla().getValueAt(filaModelo, 1);
+            
+            // Sincronizar ComboBox
             for (int i = 0; i < vista.getCbClientes().getItemCount(); i++) {
                 ComboItem item = vista.getCbClientes().getItemAt(i);
                 if (item.getId() == idClienteEnTabla) {
@@ -116,10 +122,10 @@ public class VehiculoController implements ActionListener {
                 }
             }
             
-            vista.getTxtPlacas().setText(vista.getModeloTabla().getValueAt(fila, 2).toString());
-            vista.getTxtMarca().setText(vista.getModeloTabla().getValueAt(fila, 3).toString());
-            vista.getTxtModelo().setText(vista.getModeloTabla().getValueAt(fila, 4).toString());
-            vista.getTxtAnio().setText(vista.getModeloTabla().getValueAt(fila, 5).toString());
+            vista.getTxtPlacas().setText(vista.getModeloTabla().getValueAt(filaModelo, 2).toString());
+            vista.getTxtMarca().setText(vista.getModeloTabla().getValueAt(filaModelo, 3).toString());
+            vista.getTxtModelo().setText(vista.getModeloTabla().getValueAt(filaModelo, 4).toString());
+            vista.getTxtAnio().setText(vista.getModeloTabla().getValueAt(filaModelo, 5).toString());
         }
     }
 
@@ -133,10 +139,19 @@ public class VehiculoController implements ActionListener {
         }
     }
 
+    private void cargarComboClientes() {
+        vista.getCbClientes().removeAllItems();
+        ClienteDAO cDao = new ClienteDAO();
+        List<Cliente> clientes = cDao.listarClientes();
+        for (Cliente c : clientes) {
+            vista.getCbClientes().addItem(new ComboItem(c.getIdCliente(), c.getNombre()));
+        }
+    }
+
     private Vehiculo extraerDatos() {
         ComboItem item = (ComboItem) vista.getCbClientes().getSelectedItem();
-        if (item == null) throw new RuntimeException("Selecciona un cliente válido.");
-
+        if (item == null) throw new RuntimeException("Seleccione un cliente.");
+        
         return new Vehiculo(
             item.getId(),
             vista.getTxtPlacas().getText(),
@@ -152,9 +167,9 @@ public class VehiculoController implements ActionListener {
         vista.getTxtMarca().setText("");
         vista.getTxtModelo().setText("");
         vista.getTxtAnio().setText("");
+        vista.getTxtBuscar().setText(""); // Limpiar buscador
+        vista.getSorter().setRowFilter(null); // Quitar filtro
         idVehiculoSeleccionado = -1;
-        vista.getTablaVehiculos().clearSelection();
-        cargarComboClientes();
         listar();
     }
 }
